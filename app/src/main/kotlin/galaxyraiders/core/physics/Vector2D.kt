@@ -10,54 +10,54 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   val magnitude: Double
-    get() = kotlin.math.sqrt(dx*dx + dy*dy)
+    get() = INVALID_DOUBLE
 
   val radiant: Double
-    get() = kotlin.math.atan2(dx, dy)
+    get() = INVALID_DOUBLE
 
   val degree: Double
-    get() = Math.toDegrees(radiant)
+    get() = INVALID_DOUBLE
 
   val unit: Vector2D
     get() = INVALID_VECTOR
 
   val normal: Vector2D
-    get() = Vector2D( dx / magnitude, dy / magnitude )
+    get() = INVALID_VECTOR
 
   operator fun times(scalar: Double): Vector2D {
-    return Vector2D(dx * scalar, dy * scalar)
+    return INVALID_VECTOR
   }
 
   operator fun div(scalar: Double): Vector2D {
-    return Vector2D(dx / scalar, dy / scalar)
+    return INVALID_VECTOR
   }
 
   operator fun times(v: Vector2D): Double {
-    return (v.dx * this.dx + v.dy * this.dy)
+    return INVALID_DOUBLE
   }
 
   operator fun plus(v: Vector2D): Vector2D {
-    return Vector2D(this.dx + v.dx, this.dy + v.dy)
+    return INVALID_VECTOR
   }
 
   operator fun plus(p: Point2D): Point2D {
-    return Point2D(this.dx + p.x, this.dy + p.y)
+    return INVALID_POINT
   }
 
   operator fun unaryMinus(): Vector2D {
-    return Vector2D(-dx, -dy)
+    return INVALID_VECTOR
   }
 
   operator fun minus(v: Vector2D): Vector2D {
-    return Vector2D(this.dx - v.dx, this.dy - v.dy)
+    return INVALID_VECTOR
   }
 
   fun scalarProject(target: Vector2D): Double {
-    return this.times(target) / target.magnitude
+    return INVALID_DOUBLE
   }
 
   fun vectorProject(target: Vector2D): Vector2D {
-    return target.times(scalarProject(target))
+    return INVALID_VECTOR
   }
 }
 
