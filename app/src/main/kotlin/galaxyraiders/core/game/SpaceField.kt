@@ -38,6 +38,9 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   var asteroids: List<Asteroid> = emptyList()
     private set
 
+  var explosions: List<Explosion> = emptyList()//coloquei a lista de explosions
+    private set
+
   val spaceObjects: List<SpaceObject>
     get() = listOf(this.ship) + this.missiles + this.asteroids
 
@@ -61,7 +64,16 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
-  fun trimMissiles() {
+  fun generateExplosion(asteroid: Asteroid) {//constroi os objetos explosion
+    this.explosions += this.createExplosion(asteroid)
+  }
+
+  fun triggerExplosion(){//set todas as explosoes como true
+    this.explosions.forEach { it.was_exploded() }
+  }
+
+  fun trimMissiles() {//filtra os objetos missile, se está fora da tela
+                      //tira da lista
     this.missiles = this.missiles.filter {
       it.inBoundaries(this.boundaryX, this.boundaryY)
     }
@@ -70,6 +82,13 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   fun trimAsteroids() {
     this.asteroids = this.asteroids.filter {
       it.inBoundaries(this.boundaryX, this.boundaryY)
+    }
+  }
+
+  fun trimExplosion() {//retira as explosion que ja foram setadas como true
+                      //da lista
+    this.explosions = this.explosions.filter {
+      !it.is_trigged
     }
   }
 
@@ -97,6 +116,12 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
       radius = SpaceFieldConfig.missileRadius,
       mass = SpaceFieldConfig.missileMass,
     )
+  }
+
+  private fun createExplosion(asteroid: Asteroid): Explosion {
+    return Explosion{
+      initialPosition = asteroid.initialPosition //ver se isso funciona
+    }
   }
 
   private fun defineMissilePosition(missileRadius: Double): Point2D {

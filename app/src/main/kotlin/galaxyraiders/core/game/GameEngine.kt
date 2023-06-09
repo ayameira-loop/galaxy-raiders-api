@@ -76,18 +76,24 @@ class GameEngine(
     }
   }
 
-  fun updateSpaceObjects() {
+  fun updateSpaceObjects() { //mudei aqui para renderizar a classe explosion
     if (!this.playing) return
     this.handleCollisions()
     this.moveSpaceObjects()
     this.trimSpaceObjects()
     this.generateAsteroids()
+    this.generateExplosions()
   }
 
   fun handleCollisions() {
-    this.field.spaceObjects.forEachPair {
+    this.field.spaceObjects.forEachPair {//faz o pair de 2 a 2 dos objetos na lista 
+                                        //no space field
         (first, second) ->
       if (first.impacts(second)) {
+        //se um asteroite e um missil colidir, construir um objeto explosion
+        if(first is Asteroid && second is Missile){
+          this.generateExplosion(first)
+        }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
     }
@@ -112,8 +118,13 @@ class GameEngine(
     }
   }
 
+  fun generateExplosions() {
+    this.field.trimExplosion() //retira as explosion com is_trigged = true
+    this.field.triggerExplosion() //muda is_trigged das explosions para true
+  }
+
   fun renderSpaceField() {
-    this.visualizer.renderSpaceField(this.field)
+    this.visualizer.renderSpaceField(this.field)//aqui que ele passa o json
   }
 }
 

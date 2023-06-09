@@ -1,0 +1,9 @@
+No Scoreboard deve conter:
+//-histórico de todas as execuções do jogo
+//-data e hora de início
+//-pontuação final 
+//-quantidade de asteroides destruídos
+
+No Leaderboad deve conter:
+//informações das três melhores partidas, ranqueadas pela pontuação
+//final
