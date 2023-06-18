@@ -91,8 +91,10 @@ class GameEngine(
         (first, second) ->
       if (first.impacts(second)) {
         //se um asteroite e um missil colidir, construir um objeto explosion
+        //calcular pontuação aqui
         if(first is Asteroid && second is Missile){
-          this.generateExplosion(first)
+          this.field.generateExplosion(first.center) //ver depois pois to passando o centro
+                                                     //e nao o ponto de impacto
         }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
