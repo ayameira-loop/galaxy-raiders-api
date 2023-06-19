@@ -39,7 +39,7 @@ fun main() {
   //ta no formato windows, concertar depois ou nao
   val current = LocalDateTime.now().format(formatter)
   //System.out.println(" C DATE is  "+current)
-  parsejson()
+  //parsejson()
 
   thread { gameEngine.execute() }
 
