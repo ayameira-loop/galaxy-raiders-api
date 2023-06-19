@@ -82,7 +82,6 @@ class GameEngine(
     this.moveSpaceObjects()
     this.trimSpaceObjects()
     this.generateAsteroids()
-    this.generateExplosions()
   }
 
   fun handleCollisions() {
@@ -92,9 +91,10 @@ class GameEngine(
       if (first.impacts(second)) {
         //se um asteroite e um missil colidir, construir um objeto explosion
         //calcular pontuação aqui
-        if(first is Asteroid && second is Missile){
-          this.field.generateExplosion(first.center) //ver depois pois to passando o centro
-                                                     //e nao o ponto de impacto
+        if (first is Asteroid && second is Missile){
+          this.field.generateExplosion(first) // estou passando o asteroide
+                                              // depois usando o centro do asteroide para colocar a explosão
+                                              // e nao o ponto de impacto
         }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
@@ -110,6 +110,7 @@ class GameEngine(
   fun trimSpaceObjects() {
     this.field.trimAsteroids()
     this.field.trimMissiles()
+    this.field.trimExplosions()
   }
 
   fun generateAsteroids() {
@@ -118,11 +119,6 @@ class GameEngine(
     if (probability <= GameEngineConfig.asteroidProbability) {
       this.field.generateAsteroid()
     }
-  }
-
-  fun generateExplosions() {
-    this.field.trimExplosion() //retira as explosion com is_trigged = true
-    this.field.triggerExplosion() //muda is_trigged das explosions para true
   }
 
   fun renderSpaceField() {
