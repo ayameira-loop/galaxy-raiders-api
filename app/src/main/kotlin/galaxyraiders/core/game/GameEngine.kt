@@ -7,6 +7,11 @@ import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
 import kotlin.system.measureTimeMillis
 
+import com.fasterxml.jackson.module.kotlin.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.io.File
+
 const val MILLISECONDS_PER_SECOND: Int = 1000
 
 object GameEngineConfig {
@@ -35,14 +40,24 @@ class GameEngine(
 
   var playing = true
 
+   //data e hora de inicio
+  val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+  val current = LocalDateTime.now().format(formatter)
+
+
   fun execute() {
     while (true) {
       val duration = measureTimeMillis { this.tick() }
-
+      //depois que acabar o game, pegar as informações de date, pontuação
+      //e nº de asteroids destruidos e chamar a funcão parse
       Thread.sleep(
         maxOf(0, GameEngineConfig.msPerFrame - duration)
       )
     }
+    //apenas valores para teste
+    this.parsejson(current, 120, 10)
+    //está ocorrendo o problema Unreachable code, escolhe um lugar para colocar 
+    //essa função
   }
 
   fun execute(maxIterations: Int) {
@@ -95,6 +110,8 @@ class GameEngine(
           this.field.generateExplosion(first) // estou passando o asteroide
                                               // depois usando o centro do asteroide para colocar a explosão
                                               // e nao o ponto de impacto
+          //calcular aqui a pontuação do game
+          //somar o numero de asteroids destruidos
         }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
@@ -124,6 +141,28 @@ class GameEngine(
   fun renderSpaceField() {
     this.visualizer.renderSpaceField(this.field)//aqui que ele passa o json
   }
+
+  //função para ler e escrever no arquivo json
+  fun parsejson(currentDate: String, pointing: Int, numberAsteroidsDestroyed: Int){
+      
+    val mapper = jacksonObjectMapper()
+
+    var path: String = "/home/gradle/galaxy-raiders/app/src/main/kotlin/galaxyraiders/core/score/Scoreboard.json"
+    //se o json estiver vazio dar erro,corrigir isso
+    val jsonString: String = File(path).readText(Charsets.UTF_8)
+    val jsonTextList:ArrayList<DataGame> = mapper.readValue<ArrayList<DataGame>>(jsonString)
+    val game = DataGame(currentDate,pointing,numberAsteroidsDestroyed)
+    jsonTextList.add(game)
+    // for (film in jsonTextList) {
+    //     println(film)
+    // }
+
+      
+    val jsonArray: String = mapper.writeValueAsString(jsonTextList)
+    //println(jsonArray)
+    File(path).writeText(jsonArray)
+
+  }
 }
 
 fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
@@ -133,3 +172,10 @@ fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
     }
   }
 }
+
+
+data class DataGame(
+  val startGame: String,
+  val pointing: Int,
+  val nAsteroidsDestroyed: Int
+)
