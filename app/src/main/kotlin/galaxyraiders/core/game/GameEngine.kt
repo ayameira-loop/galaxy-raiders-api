@@ -69,8 +69,6 @@ class GameEngine(
         maxOf(0, GameEngineConfig.msPerFrame - duration)
       )
     }
-    this.updateScoreboard(initTime, this.score, this.numberAsteroidsDestroyed)
-    this.updateLeaderboard(initTime, this.score, this.numberAsteroidsDestroyed)
   }
 
   fun tick() {
@@ -110,12 +108,14 @@ class GameEngine(
     this.field.spaceObjects.forEachPair {
         (first, second) ->
       if (first.impacts(second)) {
-        if (first is Asteroid && second is Missile){
-          this.field.generateExplosion(first)
-          this.score += 10/first.radius
-          this.numberAsteroidsDestroyed++
-        }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
+        if (first is Missile && second is Asteroid) {
+          this.field.generateExplosion(second)
+          this.score += 10/second.radius
+          this.numberAsteroidsDestroyed++
+          this.updateScoreboard(initTime, this.score, this.numberAsteroidsDestroyed)
+          this.updateLeaderboard(initTime, this.score, this.numberAsteroidsDestroyed)
+        }
       }
     }
   }

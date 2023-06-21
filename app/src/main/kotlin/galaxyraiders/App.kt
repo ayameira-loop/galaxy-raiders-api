@@ -34,7 +34,7 @@ fun main() {
     generator, controller, visualizer
   )
 
-  thread { gameEngine.execute(AppConfig.maxIterations) }
+  thread { gameEngine.execute() }
 
   ui.start()
 }

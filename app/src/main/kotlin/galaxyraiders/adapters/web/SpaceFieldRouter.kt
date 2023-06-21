@@ -37,7 +37,7 @@ class SpaceFieldRouter : Router, Visualizer {
       ship = field.ship,
       asteroids = field.asteroids,
       missiles = field.missiles,
-      explosions = field.explosions,//mudei aqui
+      explosions = field.explosions//mudei aqui
     )
   }
 }
