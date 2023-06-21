@@ -74,6 +74,7 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
       it != asteroid
     }
   }
+
   fun trimMissiles() {//filtra os objetos missile, se está fora da tela
                       //tira da lista
     this.missiles = this.missiles.filter {

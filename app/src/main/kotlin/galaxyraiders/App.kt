@@ -15,6 +15,7 @@ object AppConfig {
 
   val randomSeed = config.get<Int>("RANDOM_SEED")
   val operationMode = config.get<OperationMode>("OPERATION_MODE")
+  val maxIterations = config.get<Int>("MAX_ITERATIONS")
 }
 
 fun main() {
@@ -33,7 +34,7 @@ fun main() {
     generator, controller, visualizer
   )
 
-  thread { gameEngine.execute() }
+  thread { gameEngine.execute(AppConfig.maxIterations) }
 
   ui.start()
 }

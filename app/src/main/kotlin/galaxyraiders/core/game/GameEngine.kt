@@ -11,6 +11,7 @@ import com.fasterxml.jackson.module.kotlin.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.io.File
+import java.lang.Integer.min
 
 const val MILLISECONDS_PER_SECOND: Int = 1000
 
@@ -40,9 +41,12 @@ class GameEngine(
 
   var playing = true
 
+  var score: Double = 0.0
+  var numberAsteroidsDestroyed: Int = 0
+
    //data e hora de inicio
   val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-  val current = LocalDateTime.now().format(formatter)
+  val initTime = LocalDateTime.now().format(formatter)
 
 
   fun execute() {
@@ -54,16 +58,19 @@ class GameEngine(
         maxOf(0, GameEngineConfig.msPerFrame - duration)
       )
     }
-    //apenas valores para teste
-    this.parsejson(current, 120, 10)
-    //está ocorrendo o problema Unreachable code, escolhe um lugar para colocar 
+    //está ocorrendo o problema Unreachable code, escolhe um lugar para colocar
     //essa função
   }
 
   fun execute(maxIterations: Int) {
     repeat(maxIterations) {
-      this.tick()
+      val duration = measureTimeMillis { this.tick() }
+      Thread.sleep(
+        maxOf(0, GameEngineConfig.msPerFrame - duration)
+      )
     }
+    this.updateScoreboard(initTime, this.score, this.numberAsteroidsDestroyed)
+    this.updateLeaderboard(initTime, this.score, this.numberAsteroidsDestroyed)
   }
 
   fun tick() {
@@ -91,7 +98,7 @@ class GameEngine(
     }
   }
 
-  fun updateSpaceObjects() { //mudei aqui para renderizar a classe explosion
+  fun updateSpaceObjects() {
     if (!this.playing) return
     this.handleCollisions()
     this.moveSpaceObjects()
@@ -100,18 +107,13 @@ class GameEngine(
   }
 
   fun handleCollisions() {
-    this.field.spaceObjects.forEachPair {//faz o pair de 2 a 2 dos objetos na lista 
-                                        //no space field
+    this.field.spaceObjects.forEachPair {
         (first, second) ->
       if (first.impacts(second)) {
-        //se um asteroite e um missil colidir, construir um objeto explosion
-        //calcular pontuação aqui
         if (first is Asteroid && second is Missile){
-          this.field.generateExplosion(first) // estou passando o asteroide
-                                              // depois usando o centro do asteroide para colocar a explosão
-                                              // e nao o ponto de impacto
-          //calcular aqui a pontuação do game
-          //somar o numero de asteroids destruidos
+          this.field.generateExplosion(first)
+          this.score += 10/first.radius
+          this.numberAsteroidsDestroyed++
         }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
@@ -142,26 +144,39 @@ class GameEngine(
     this.visualizer.renderSpaceField(this.field)//aqui que ele passa o json
   }
 
-  //função para ler e escrever no arquivo json
-  fun parsejson(currentDate: String, pointing: Int, numberAsteroidsDestroyed: Int){
-      
+  fun updateScoreboard(currentDate: String, score: Double, numberAsteroidsDestroyed: Int) {
     val mapper = jacksonObjectMapper()
-
     var path: String = "/home/gradle/galaxy-raiders/app/src/main/kotlin/galaxyraiders/core/score/Scoreboard.json"
-    //se o json estiver vazio dar erro,corrigir isso
     val jsonString: String = File(path).readText(Charsets.UTF_8)
-    val jsonTextList:ArrayList<DataGame> = mapper.readValue<ArrayList<DataGame>>(jsonString)
-    val game = DataGame(currentDate,pointing,numberAsteroidsDestroyed)
+    val jsonTextList: ArrayList<DataGame> = if (jsonString.isNotEmpty()) {
+      mapper.readValue(jsonString)
+    } else {
+      ArrayList()
+    }
+    val game = DataGame(currentDate, score, numberAsteroidsDestroyed)
     jsonTextList.add(game)
-    // for (film in jsonTextList) {
-    //     println(film)
-    // }
 
-      
     val jsonArray: String = mapper.writeValueAsString(jsonTextList)
-    //println(jsonArray)
     File(path).writeText(jsonArray)
+  }
 
+  fun updateLeaderboard(currentDate: String, score: Double, numberAsteroidsDestroyed: Int) {
+    val mapper = jacksonObjectMapper()
+    var path: String = "/home/gradle/galaxy-raiders/app/src/main/kotlin/galaxyraiders/core/score/Leaderboard.json"
+    val jsonString: String = File(path).readText(Charsets.UTF_8)
+    val jsonTextList: ArrayList<DataGame> = if (jsonString.isNotEmpty()) {
+      mapper.readValue(jsonString)
+    } else {
+      ArrayList()
+    }
+    val game = DataGame(currentDate, score, numberAsteroidsDestroyed)
+    jsonTextList.add(game)
+
+    val sortedList = jsonTextList.sortedByDescending { it.score }
+    val top3Entries = sortedList.take(min(sortedList.size, 3))
+
+    val jsonArray: String = mapper.writeValueAsString(top3Entries)
+    File(path).writeText(jsonArray)
   }
 }
 
@@ -174,8 +189,8 @@ fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
 }
 
 
-data class DataGame(
+data class DataGame (
   val startGame: String,
-  val pointing: Int,
-  val nAsteroidsDestroyed: Int
+  val score: Double,
+  val asteroidsDestroyed: Int
 )
