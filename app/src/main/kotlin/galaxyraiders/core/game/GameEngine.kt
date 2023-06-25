@@ -141,7 +141,7 @@ class GameEngine(
   }
 
   fun renderSpaceField() {
-    this.visualizer.renderSpaceField(this.field)//aqui que ele passa o json
+    this.visualizer.renderSpaceField(this.field)
   }
 
   fun updateScoreboard(currentDate: String, score: Double, numberAsteroidsDestroyed: Int) {
@@ -156,7 +156,12 @@ class GameEngine(
     val game = DataGame(currentDate, score, numberAsteroidsDestroyed)
     jsonTextList.add(game)
 
-    val jsonArray: String = mapper.writeValueAsString(jsonTextList)
+    val uniqueData = jsonTextList
+      .groupBy { it.startGame }
+      .values
+      .map { group -> group.maxByOrNull { it.score } }
+
+    val jsonArray: String = mapper.writeValueAsString(uniqueData)
     File(path).writeText(jsonArray)
   }
 

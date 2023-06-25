@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fee5f3cd-3079-45c4-9cd1-5df99ee1fbff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/physics/Point2D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/physics/Point2D.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/physics/Vector2D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/physics/Vector2D.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/game/GameEngine.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/galaxyraiders/core/game/GameEngine.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
